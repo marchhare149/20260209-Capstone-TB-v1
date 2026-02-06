@@ -1,4 +1,4 @@
-# ALB SG: allow HTTP from Internet
+# ALB Security Group - allow HTTP from Internet
 resource "aws_security_group" "alb_sg" {
   name        = "alb-sg"
   description = "ALB allows HTTP from internet"
@@ -18,40 +18,12 @@ resource "aws_security_group" "alb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = { Name = "alb-sg" }
+  tags = {
+    Name = "alb-sg"
+  }
 }
 
-# WordPress SG: allow HTTP from ALB SG, SSH from Bastion SG (later)
-resource "aws_security_group" "wp_sg" {
-  name        = "wordpress-sg"
-  description = "WordPress allows HTTP from ALB"
-  vpc_id      = aws_vpc.main.id
-
-  ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id]
-  }
-  ingress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    security_groups = [aws_security_group.bastion_sg.id]
-  }
-
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = { Name = "wordpress-sg" }
-}
-
-# Bastion SG: allow SSH from your IP (replace later)
+# Bastion Security Group - allow SSH from your IP
 resource "aws_security_group" "bastion_sg" {
   name        = "bastion-sg"
   description = "Bastion allows SSH from admin IP"
@@ -71,34 +43,16 @@ resource "aws_security_group" "bastion_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = { Name = "bastion-sg" }
+  tags = {
+    Name = "bastion-sg"
+  }
 }
 
-# RDS SG: allow MySQL from WordPress SG
-resource "aws_security_group" "rds_sg" {
-  name        = "rds-sg"
-  description = "RDS allows MySQL from WordPress"
-  vpc_id      = aws_vpc.main.id
-
-  ingress {
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    security_groups = [aws_security_group.wp_sg.id]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = { Name = "rds-sg" }
-}
+# WordPress Security Group - allow HTTP from ALB, SSH from Bastion
 resource "aws_security_group" "wp_sg" {
-  name   = "wordpress-sg"
-  vpc_id = aws_vpc.main.id
+  name        = "wordpress-sg"
+  description = "WordPress allows HTTP from ALB and SSH from Bastion"
+  vpc_id      = aws_vpc.main.id
 
   ingress {
     from_port       = 80
@@ -120,5 +74,33 @@ resource "aws_security_group" "wp_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = "wordpress-sg"
+  }
 }
 
+# RDS Security Group - allow MySQL from WordPress
+resource "aws_security_group" "rds_sg" {
+  name        = "rds-sg"
+  description = "RDS allows MySQL from WordPress"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.wp_sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "rds-sg"
+  }
+}
