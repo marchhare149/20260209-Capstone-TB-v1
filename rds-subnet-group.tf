@@ -1,4 +1,4 @@
-resource "aws_db_subnet_group" "db_subnet_group" {
+resource "aws_db_subnet_group" "db_subnet_group-v1" {
   name       = "db-subnet-group"
   description = "DB subnet group for RDS"
   subnet_ids = [
