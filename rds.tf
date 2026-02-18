@@ -13,6 +13,7 @@ resource "aws_db_instance" "wordpress" {
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
 
   multi_az            = true
+  apply_immediately = true
   publicly_accessible = false
 
   skip_final_snapshot = true

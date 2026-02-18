@@ -12,7 +12,7 @@ The focus of this project is infrastructure architecture, security design, and h
 
 ## Architecture Diagram
 
-![Architecture Diagram](diagram/architecture-v1.png)
+![Architecture Diagram](diagram/architecture-v01.png)
 
 ## Architecture Summary
 
